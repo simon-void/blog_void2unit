@@ -14,13 +14,13 @@ enableInlineShortcodes = true
 ignoreErrors = ["error-remote-getjson"]
 
 [params]
-  color = 'gray'   # linen, wheat, gray, light
+  color = 'linen'   # linen, wheat, gray, light
 
-#   github = 'simon-void'
+  github = 'simon-void'
 
-#   avatar = 'nanxiaobei@gmail.com'
-#   name = 'Stephan Schröder'
-#   bio = ''
+  avatar = 'https://avatars.githubusercontent.com/u/8070979?v=4'
+  name = 'Stephan Schröder'
+  bio = 'simply spreading some dev tips'
 # ------------------------------
 
 # needed to  render raw HTML (e.g. <sub>, <sup>, <kbd>, <mark>)
