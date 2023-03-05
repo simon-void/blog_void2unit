@@ -4,12 +4,13 @@ title = "Really useful 4 lines of Kotlin code (using inline class)"
 date = "2023-02-16"
 description = "use an inline class to prevent leaking passwords in your logs"
 tags = [
-    "Kotlin",
+    "kotlin",
+    "inline class",
 ]
 +++
 
 
-So here's 4 lines of code that should probably be part of every Kotlin/JVM project containing authentication:
+So here are 4 lines of code that should probably be part of every Kotlin/JVM project containing authentication:
 ```kotlin
 @JvmInline
 value class Password(val value: String) {
@@ -35,7 +36,7 @@ data class SomeServerConfig @ConstructorBinding constructor(
 ```
 
 The primary advantage of inline classes is that the compiler can now prevent parameter mix-ups between "stringly-types" values
-(or other basic types like Int, Long, you get the idea). E.g. imagine a version where `SomeServerConfig.password` was a normal `String`.
+(or other basic types like Int, Long, and such). E.g. imagine a version where `SomeServerConfig.password` was a normal `String`.
 In that case this code
 ```kotlin
 fun login(username: String, password: String) {...}
@@ -46,12 +47,12 @@ wouldn't give you a compile-time warning. But if `password` is of a different ty
 
 ### So how does this version of a password increase security even more?
 
-It's safe to log! Dev often log the contents of there configuration objects
+It's safe to log! Developers often log the contents of there configuration objects
 ```kotlin
 logger.info("using settings: $someServerConfig")
 ```
 This often leaks passwords into log files, which we want to avoid for obvious reasons.
-Which brings us to the reason we overrode the `toString`-method of our `Password` class. No further leakage of secrets does occur, even
+This brings us to the reason we overrode the `toString`-method of our `Password` class. No further leakage of secrets does occur, even
 without the programmer doing the logging having to think about it. The log file is clean:
 ```text
 2023-02-16T15:35:05 INFO 26356 --- using settings: SomeServerConfig(username=asmith84, password=***, host=someserver.com, port=34)
@@ -64,7 +65,7 @@ Then you use normal property access syntax: `password.value`
 ## Why "@JvmInline value class" and not "data class" or even "class"?
 
 The reason to use `@JvmInline value class` is because it's more efficient. Data classes and normal classes lead to an additional pointer indirection
-at runtime, which makes the code a tiny bit slower. Inline classes (mostly) disappear completely at runtime (the exception is putting these instances in typed collections and similar).
+at runtime, which makes the code a tiny bit slower. Inline classes (mostly) disappear completely at runtime (the exception is putting these instances in typed collections and similar generic constructs).
 So you get all the additional compiletime safety without additional runtime cost.
 
 ## Anything else to know?

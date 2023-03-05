@@ -4,9 +4,9 @@ title = "How to replace the builder pattern in Kotlin"
 date = "2023-01-11"
 description = "Java has Lombok with its @Builder annotation. How to replicate this functionality when moving the codebase to Kotlin"
 tags = [
-    "Kotlin",
-    "Lombok",
-    "Builder",
+    "kotlin",
+    "lombok",
+    "builder",
     "mapstruct",
 ]
 +++
