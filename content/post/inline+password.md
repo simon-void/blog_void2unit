@@ -70,10 +70,6 @@ So you get all the additional compiletime safety without additional runtime cost
 
 ## Anything else to know?
 - You don't need any additional Spring configuration to deserialization into inline classes instead of basic classes (String, Int, ...).
-- Like the annotation `@JvmInline` is hinting at, the only Kotlin backend that supports inline classes is the JVM
-(in contrast to other Kotlin backends like [Native](https://kotlinlang.org/docs/native-overview.html), [JS](https://kotlinlang.org/docs/js-overview.html) or soon [Wasm](https://kotlinlang.org/docs/whatsnew-eap.html?utm_campaign=wasm&utm_medium=social&utm_source=blog#new-kotlin-wasm-target)).
-This might change in the future and the concept of value classes will probably be extended to contain more than one property. 
-This development is linked to Java's [Project Valhalla](https://www.baeldung.com/java-valhalla-project).
 - Another nifty thing to add to inline classes is validation, so that only validated instances of your data can exist:
 ```kotlin
 @JvmInline
