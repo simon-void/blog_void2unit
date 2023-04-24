@@ -9,7 +9,7 @@ tags = [
 draft = true
 +++
 
-# Safe Null Safety or !! considered unsafe
+# Safe Null-Safety
 
 Learning Kotlin changed the way I prefer to program.
 Since then, it's a bit tedious to work in programming languages that don't offer null safety and sum types (sealed classes) in one way or another.
@@ -55,16 +55,18 @@ no surprises! ->
 
 **TLDR:** No, we don't. Use optional parameters (=parameters with default arguments) in your Kotlin class and use named parameters when invoking it.
 
-## What is the problem Lombok @Builder is solving?
+## Parse, don't validate
 
-Let's assume we have a DTO containing many properties including `username` and `password`. The class has one constructor to initialize all its properties.
-Invoking this constructor in Java>=10 will look something like this:
+Let's look at it in the context of loading a json file. A json file can contain
+arbitrary content, but our app certainly expects a certain structure. (This is related to *"Even a NoSQL database
+has a schema, albeit an implicit one."*") So when this json file comes in we first have to ascertain that it's in the structure
+the rest of the application is build around.
 
-```java
-var a = new A(null, null, "a_schmidt", "1234", null, null);
-```
+Any json file can always be transformed into a `Map<String, Any?>` where the values are either "primitive types" 
+(a `String`, a `Boolean`, an `Int`, an `Float` or `null`) or an `Array` or `Map<String, Any?>` containing these types. 
 
-The issues here include:
-- a lot of visual noise (having to write `null` for all the parameters you don't have a value for)
-- are you sure that username and password are on the right position without jumping to the constructor definition?
-  The compiler only guarantees that the types are matching, but how do you know that you didn't mix up the order of - in this case - username and password?
+*Validating* is the more straight forward of the two. 
+
+### Example of an DTO using Jackson
+
+### What to do in the presence of multiple possible schemas
