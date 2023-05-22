@@ -1,209 +1,191 @@
 +++
 author = "Stephan Schröder"
-title = "Safe Null Safety or !! considered unsafe"
-date = 2023-03-16T21:56:19+01:00
-description = "Kotlin's flavour of null safety is famously unsound, but this unsoundness can be dealt with at the edge to technologies that have no concept of nullability (e.g. Java or JSON)."
+title = "Safe Null-Safety or Null at the Gates"
+date = 2023-05-22T21:10:19+01:00
+description = "All 'harmfull' nulls should be dealt with at the edge between systems that allow nullability and Kotlin"
 tags = [
     "kotlin",
 ]
 draft = true
 +++
 
-# Safe Null-Safety or !! considered unsafe
+# Safe Null-Safety or Null at the Gates
 
-Learning Kotlin changed the way I prefer to program.
-Since then, it's a bit tedious to work in programming languages that don't offer null safety and sum types (sealed classes) in one way or another.
-This is why I tend to get puzzled when I meet other developers (or their code) who clearly didn't come to the same conclusion.
-Sometimes you hear sentences like "Nullability is overrated", sometimes it's code which is littered with the not-null assertion operator `!!`,
-clearly only there to shut up the compiler.
+Since I learned about non-nullable types, I don't like to work in languages that don't offer them in one way or another
+(non-nullable types and sealed classes actually).
+This is why I tend to get puzzled when I encounter developers (or their code) who clearly didn't come to the same conclusion.
+Sometimes you hear sentences like "Nullability is overrated", sometimes it is deeper layers of the programm being littered with the not-null assertion operator `!!`.
 
-So let's see how to restrict the unsoundness of Kotlin's null safety in order to harness the full power of nullability.
+This article is about how I use null-safety to extract its maximum value.
 
-## Kotlin's unsound constructs
+## TLDR
 
+The aim of safe null-safety is to get rid of nullable types as early as possible, which is at the border between parts of
+the system that do have non-nullability information attached to it (Kotlin code, SQL databases, GraphQL, ...) and those
+parts that don't (Java code without nullability annotations, NoSQL databases, REST, ...)
 
-### platform types
+## The slightly longer version
 
-Next to a non-nullable type `T` and a nullable type `T?` there is also the platform type `T!`. You can assign this type yourself,
-instead it is assigned by Kotlin's type inference to any instance that is returned by Java code (at least those that haven't been
-annotation with [certain nullability annotations](https://www.baeldung.com/kotlin/platform-types#java-annotations-supporting-nullability-check)).
+There are only two types of null values, expected ones ("not every Person instance has an Address linked to it, and this instance hasn't")
+and unexpected ones ("every Person should have a first name, but this entry from the NoSQL db comes without one").
 
-The designers of Kotlin could have decided to make any
+Whenever you see a random null-assertion sprinkled in the codebase, that means one of two things:
+- in the case of an "unexpected null" there was a failure to block the null from entering deeper into the codebase by declaring that variable/property non-null.
+- in the case of an "expected null" it should be clear how to handle it. There should be a fallback value/behaviour available to handle this case.
 
-- `lateinit`/`Delegates.notNull()`
-- not-null asserting code `x!!` (or in a slightly different forms `x ?: errror("x expected to not be null")`, `requireNotNull(x)`, `checkNotNull(x)`)
+The aim of proper null-safety is to get rid of unexpected nulls as early as possible.
+You should only ever find null-assertion statements of whatever kind in the validation layer of data at the border
+to null-unaware datasource (or in tests).
 
-### how to handle nullable values
-- argument to functions expecting a nullable value
-- `if`, `when`, `?:` to handle case of null
-- `if`, `when`, `try catch` are expressions and can help initialise non-nullable variables
-- `?:` to provide a fallback value
-- `filterNotNull()` to filter a list containing `List<T?>` to a `List<T>`
+### Discipline
 
-**definition of unsafe**
-- ok to use if you verify that it's sound in a way the compiler can't
-- use sparingly/controlled, in other words not littered throughout the code base
+There isn't really a big idea in this blog post, the big idea are non-nullable types on their own. The point of this
+blog post is that you have to be disciplined to see this all the way through, even when things don't stay as easy as
+simply putting non-nullable annotations on your DTOs.
 
-**benefits of sound(ish) null safety**
-no surprises! ->
-- the null becomes 100% intentional to denote the absence of an object on a domain level
-- make the null useful e.g. as mark an object for immediate removal (`mapNotNull()`)
-- no null checks needed -> shorter straight forward code
-- invocation chains are no longer brittle
+I've heard of a Kotlin REST endpoint were every property of the DTO was made nullable, because the data sent actually came
+from a NoSQL database. Since no guarantees can be made in a NoSQL db, no non-nullability guarantees where given inside
+the Kotlin app. Whoever wrote this code clearly forgot that 
+**every database, even if it is called schemaless, has a schema**. After all, pure random data isn't useful (as a source)
+of information. The better approach would have been to make the implicit schema of the data contained in the db explicit.
 
-**But what about Lombok's @Builder annotation? There seems to be no in-build builder facility in Kotlin. Do we have to implement a Builder for each class manually?**
+#### an organically grown database might have several schema, actually
 
-**TLDR:** No, we don't. Use optional parameters (=parameters with default arguments) in your Kotlin class and use named parameters when invoking it.
-
-## Parse, don't validate
-
-Let's look at it in the context of loading a json file. A json file can contain
-arbitrary content, but our app certainly expects a certain structure. This is very much related to the quote:
-*"Even a NoSQL database has a schema, albeit an implicit one"*. So let's call this expected structure
-the (implicit) schema from now on, even though no explict schema definition file exists. 
-So when this json file comes in we first have to ascertain that it conforms to the schema the rest of the application is build around.
-
-Let's look at this with a practical example: The schema we expect is that of a non-empty list of Persons.
-In this simplified example a Person always comes with a first name, a last name 
-(**falsehoods programmers believe about names**), and also a list of Addresses that always contains one or two Address.
-With an Address containing a street name with house number, a postal code and the name of a city.
-
-Given that any json file can always be transformed into/represented by a `Map<String, Any?>` where the values are either "primitive types"
-(a `String`, a `Boolean`, an `Int`, an `Float` or `null`) or an `Array<Any?>` or `Map<String, Any?>` containing these types,
-let's see how *validating* and *parsing* are different from each other. 
-
-### Pure Validating
-
-In its purest form validation doesn't transform the data structure it validates. It simply returns a Boolean telling you
-whether the given data conforms to the required schema:
-```kotlin
-fun main() {
-    val json = readJson("someFile.json")
-    if(!json.validatePersons()) error("json didn't meet the required schema")
-    // from now on you can access the json data structure freely (within the limits of the schema)
-    // knowing that your casts will never fail and accessing the guaranteed content will never return null
-    // (the second address isn't guaranteed after all)
-}
-
-
-fun readJson(fileName: String): Any? = TODO() // returns Map, List, String, Int, Float or null
-
-fun Any?.validatePersons(): Boolean = (this as? List)?.let { it.isNotEmpty() && it.all { ::validatePerson } } ?: false
-
-private fun validatePerson(person: Any?): Boolean {
-    if(person !is Map) return false
-    return persong.getOrNull("firstName").isNonNullAndNonBlankString() &&
-            person.getOrNull("lastName").isNonNullAndNonBlankString() &&
-            person.getOrNull("addresses").let {
-                if(it !is List || it.size !in 1..2) {
-                    false
-                } else {
-                    validateAddress(it[0]) && it[1].let { it == null || validateAddress(it) }
-                }
-            }
-}
-
-private fun validateAddress(address: Any?): Boolean = address is Map &&
-    this["streetNameAndNr"].isNonNullAndNonBlankString() &&
-    this["postalCode"].isNonNullAndNonBlankString() &&
-    this["city"].isNonNullAndNonBlankString()
-
-private fun Any?.isNonNullAndNonBlankString() = (this as? String)?.isNotBlank() ?: false
-private fun Any?.isPositiveInt() = (this as? Int)?.let { it > 0 } ?: false
-```
-In a typed language like Kotlin operating on `Any?` is a major red flag, but in untyped languages you might not even
-blink an eye when reviewing code like this.
-
-While accessing the data like this is safe in principle, the compiler won't be able to flag if you later violate the schema
-you validated against. While
-```kotlin
-val persons = json as List
-if(persons.isNotEmpty()) {
-    val person = persons[0] as Map<Any?, Any?>
-    val firstAddress = person["addresses"] as Map<Any?, Any?>
-    val streetNameAndNr = firstAddress["streetNameAndNr"] as String
-}
-```
-is technically "safe" after the `validate()`-step, no code review would ever let it pass in a typed language.
-
-### maximum parsing
-
-Parsing is different from validating in that it not only tells you, if the data is valid, but also puts it in a structure
-that will explicitly retain the guarantees that the validation only momentarily and locally verifies.
+The primary schema of a database might change over time leaving datasets of the older schemas within the database.
+E.g. imagine having a NoSQL customer database that is used to contain only the name and email-address of a customer, but
+nowadays also the address and telephone number of the customer are stored. As long as you only have two overlaying schemas,
+using nullable properties seems sensible, at least as first, until some devs will realize that the presence of one property
+(let's say the telephone number) does imply the presence of another property (the address). 
+I think what we've reached here as soon as more than one implicit schema is present in our database is the limit of
+normal single class validation. Instead of validating that the data conforms to one schema with several nullable properties,
+actually we still should do that as a first step, we should than parse this "raw domain object" into a "sealed domain object"
+with one child per implicit database. **If your data has more than one schema, make it explicit!**
 
 ```kotlin
-fun main() {
-    val json = readJson("someFile.json")
-    val persons: List<Person> = json.parsePersons()
-    // do stuff with a strongly typed data structure that the compiler can reason about
-}
-
-
-fun readJson(fileName: String): Any? = TODO() // returns Map, List, String, Int, Float or null
-
-fun Any?.parsePersons(): List<Person> = (this as? List)?.mapNotNull( ::parsePerson ) ?: emptyList()
-
-private fun parsePerson(personJson: Any?): Person? {
-    if(personJson !is Map) return null
-    val nonBlankNames = listOf(
-            personJson.getOrNull("firstName"),
-            personJson.getOrNull("lastName"),
-        ).mapNotNull {
-            NonBlankString.newOrNull(it)
-        }
-    if(nonBlankNames.size!=2) return null
-    val (firstName, lastName) = nonBlankNames
+sealed class Customer(
+    val name: String,
+    val email: ValidEmail, // ValidEmail is a value class wrapping String with some additional validation
+) {
+    class V1(
+        name: String,
+        email: ValidEmail,
+    ): Customer (name, email)
     
-    val addressListJson = personJson.getOrNull("addresses") as? List<Any?> ?: emptyList()
-    val addresses = addressListJson.mapNotNull( ::parseAddress )
-    return if(address.size in 1..2) {
-        Person(firstName, lastName, addresses[0], addresses.getOrNull(1))
-    } else null
-}
-
-private fun parseAddress(addressJson: Any?): Address? {
-    if(addressJson !is Map) return null
-    val fields = listOf(
-            addressJson.getOrNull("streetNameAndNr"),
-            addressJson.getOrNull("postalCode"),
-            addressJson.getOrNull("city"),
-    ).mapNotNull {
-        NonBlankString.newOrNull(it)
-    }
-    if(fields.size!=3) return false
-    val (streetNameAndNr, postalCode, city) = fields
-    return Address(streetNameAndNr, postalCode, city)
-}
-
-data class Person(
-    val firstName: NonBlankString,
-    val lastName: NonBlankString,
-    val firstAddress: Address,
-    val secondAddress: Address?, 
-)
-
-data class Address(
-    val streetNameAndNr: NonBlankString,
-    val postalCode: NonBlankString,
-    val city: NonBlankString,
-)
-
-@JvmInline
-value class NonBlankString private constructor(val value: String) {
-    companion object {
-        fun newOrNull(value: String?): NonBlankString? =
-            if(value.isBlankOrNull()) null else NonBlankString(value)  
-    }
+    class V2(
+        name: String,
+        email: ValidEmail,
+        val address: Address,
+        val phoneNumber: ValidPhoneNr,
+    ): Customer (name, email)
 }
 ```
 
-## some parsing patters
+Different Services of you class can now reject whole versions of the Customer domain object. A Single check if you're
+in a certain subclass is necessary, smart-cast will do the rest, no need for superfluous null-checks or not-null-assertion.
 
-### Example of an DTO using Jackson
+## Lower hanging Fruits
 
-### What to do in the presence of multiple possible schemas
+But maybe that's all going too far, and the real issue is that (parts of) your team only recently switch from Java to
+Kotlin. In that case there might be some valuable lessons to be substantiated. It should go without saying, but everything that can be non-nullable, should be non-nullable. This not only holds for
+properties but also variable. Kotlin being expression-oriented instead of statement-oriented goes a long way in this regard.
 
-Notes & References:
-- falsehoods programmers believe about names
-- falsehoods programmers believe about addresses
-- parse, don't validate
+
+### avoid initialising variables with null
+
+A typical pattern for variable initialisation in Java looks like this:
+
+```java
+Object obj;
+if(...) {
+    obj = $expression1;
+} else {
+    obj = $expression2;
+}
+```
+
+If you run the IntelliJ's Java-to-Kotlin transpiler over it, it'll produce:
+
+```kotlin
+var obj: Any? = null
+if(...) {
+    obj = $expression1
+} else {
+    obj = $expression2
+}
+```
+
+This isn't ideal! Since in Kotlin *if-else* is an expression and the variable doesn't need to be nullable (or mutable).
+You should immediately fix this up to:
+
+```kotlin
+val obj: Any = if(...) {
+    $expression1
+} else {
+    $expression2
+}
+```
+
+Of course not only is *if-else* an expression but so are *when* and *try-catch*. Since *try-catch* can look a bit different,
+even though it is essentially the same, let me give an example more:
+
+```java
+public Object someFunc(...) {
+    Object result;
+    try {
+        result = $expression;
+    } catch (... e) {
+        log(e)
+        throw e
+    }
+    return result;
+}
+```
+
+should become
+
+```kotlin
+someFunc(...): Any = try { // non-nullable Any
+    $expression
+} catch (e: ...) {
+        log(e)
+        throw e
+}
+```
+
+In this case we didn't only make the variable non-nullable but also superfluous. But note that the non-nullability of the
+result of the *try-catch* expression is still present in the non-nullability of the function's return type.
+
+### avoid initialising properties with null
+
+This is so straight forward that it's mainly for completeness here. Use *lateinit* (or [Delegates.notNull()](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.properties/-delegates/not-null.html))
+to replace nullable properties with non-nullable ones.
+
+Instead of autogenerated Kotlin code like this
+
+```kotlin
+class Service {
+    @Autowired
+    var otherService: OtherService? = null
+    ...
+}
+```
+
+use 
+
+
+```kotlin
+class Service {
+    @Autowired
+    lateinit var otherService: OtherService
+    ...
+}
+```
+
+or even better in this example use constructor injection!
+
+```kotlin
+class Service(
+    var otherService: OtherService, 
+) {
+}
+```
