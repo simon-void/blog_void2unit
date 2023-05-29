@@ -1,6 +1,6 @@
 +++
 author = "Stephan Schröder"
-title = "Hermetic Null-Safety or Null at the Gates"
+title = "Null at the Gates"
 date = 2023-05-22T21:10:19+01:00
 description = "All 'harmfull' nulls should be dealt with at the edge between systems that allow nullability and Kotlin"
 tags = [
@@ -9,7 +9,7 @@ tags = [
 draft = true
 +++
 
-# Hermetic Null-Safety or Null at the Gates
+# Null at the Gates
 
 Since I learned about non-nullable types, I don't like to work in languages that don't offer them in one way or another
 (non-nullable types and sealed classes actually).
@@ -20,7 +20,7 @@ This article is about how I use null-safety to extract its maximum value.
 
 ## TLDR
 
-The aim of hermetic null-safety is to get rid of nullable types as early as possible, which is at the border between parts of
+The aim of null-safety is to get rid of nullable types as early as possible, which is at the border between parts of
 the system that do have non-nullability information attached to it (Kotlin code, SQL databases, GraphQL, ...) and those
 parts that don't (Java code, NoSQL databases, REST, ... at least when they come without some added kind of nullability annotations/contract).
 
@@ -33,7 +33,7 @@ Whenever you see a random null-assertion sprinkled in the codebase, that means o
 - in the case of an "unexpected null" there was a failure to block the null from entering deeper into the codebase by declaring that variable/property non-null.
 - in the case of an "expected null" it should be clear how to handle it. There should be a fallback value/behaviour available to handle this case.
 
-The aim of hermetic null-safety is to get rid of unexpected nulls as early as possible.
+The aim of null-safety is to get rid of unexpected nulls as early as possible.
 You should only ever find null-assertion statements of whatever kind in the validation layer of data at the border
 to null-unaware datasource (or in tests).
 
