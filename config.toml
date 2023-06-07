@@ -2,7 +2,7 @@ baseURL = 'https://void2unit.onrender.com/'
 languageCode = 'en'
 title = 'void2unit'
 
-theme = "paper"
+theme = "hugo-paper"
 
 author = "Stephan Schröder"
 copyright = "Copyright © 2023-2033, Stephan Schröder; all rights reserved."
