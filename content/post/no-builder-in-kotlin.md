@@ -11,8 +11,6 @@ tags = [
 ]
 +++
 
-*Notice*: This blog post was first published by me on the [Tech Blog of gematik GmbH](https://code.gematik.de/tech/2023/01/11/no-builder-in-kotlin.html).
-
 Kotlin was developed  as a "better Java", with the interoperability with it being a primary concern. Not totally coincidentally that makes moving from Java to Kotlin very straightforward.
 Most features of Java and its immediate ecosystem including the likes of Lombok have direct or not-so-direct counterparts.
 So while rewriting a Java project to Kotlin, should you e.g. encounter a Lombok @Data annotation you can simply use a `data class` on Kotlin's side.
