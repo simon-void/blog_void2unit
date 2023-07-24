@@ -6,7 +6,6 @@ description = "All 'harmfull' nulls should be dealt with at the edge between sys
 tags = [
     "kotlin",
 ]
-draft = true
 +++
 
 # Null at the Gates
