@@ -11,8 +11,6 @@ tags = [
 ]
 +++
 
-# Minimal CXF setup using Gradle, Kotlin and SpringBoot3 
-
 I spend a lot of time recently trying to figure out how to properly configure [Apache CXF](https://cxf.apache.org/)
 with Gradle, Kotlin and SpringBoot3 (so using Jakarta instead of JaxWS).
 

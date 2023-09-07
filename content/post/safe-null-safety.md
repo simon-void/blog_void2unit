@@ -8,8 +8,6 @@ tags = [
 ]
 +++
 
-# Null at the Gates
-
 Since I learned about non-nullable types, I don't like to work in languages that don't offer them in one way or another
 (non-nullable types and sealed classes actually).
 This is why I tend to get puzzled when I encounter developers (or their code) who clearly didn't come to the same conclusion.
