@@ -2,7 +2,7 @@
 author = "Stephan Schröder"
 title = "Kotlin just got Virtual Threads"
 date = 2023-09-25T14:34:01+02:00
-description = "showcasing the usage of Virtual Threads in Kotlin"
+description = "showcasing Virtual Threads in Kotlin"
 tags = [
     "kotlin",
 ]
