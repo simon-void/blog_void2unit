@@ -12,7 +12,7 @@ It's easy to forget, but whenever Java gains new functionality, so does Kotlin (
 
 ## JDK 21 comes with support for Virtual Threads
 
-So Kotlin with a JDK 21 backend has support for Virtual Treads. E.g. let's look at how we could implement a
+So Kotlin with a JDK 21 backend has support for [Virtual Treads](https://openjdk.org/jeps/444). E.g. let's look at how we could implement a
 `concurrentMap` extension functions:
 
 ```kotlin
@@ -68,7 +68,7 @@ JvmTarget for the JDK 21, so older Kotlin versions do not run on the JDK 21 back
 
 ## What about Coroutines?
 
-But Kotlin already has Coroutines. So why would Virtual Threads be used in Kotlin anyway?
+But Kotlin already has [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html). So why would Virtual Threads be used in Kotlin anyway?
 
 Well, both Coroutines and Virtual Threads enable concurrent programming, but according to Kotlin's project lead, both
 approaches are optimized for different things and therefor either one can be the appropriate one to use depending on the
