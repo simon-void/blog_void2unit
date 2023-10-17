@@ -1,7 +1,7 @@
 +++
 author = "Stephan Schröder"
 title = "How to add Kotlin as a second language to a SpringBoot app using Maven multimodule"
-date = 2023-10-17T21:54:00+02:00
+date = 2023-10-17T14:54:00+02:00
 description = "showcasing how to configure a SpringBoot app using Maven multimodule to allow Kotlin next to Java"
 tags = [
     "kotlin", "maven", "spring boot"
