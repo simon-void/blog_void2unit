@@ -63,8 +63,9 @@ total execution time: 1240ms
 ```
 You can find the repo for this project [here](https://github.com/simon-void/vthreads_with_kotlin_demo).
 
-Notice that the Kotlin version used for this code is **1.9.20-Beta2**. We need this high of a version since Kotlin 1.9.20 comes with a new
-JvmTarget for the JDK 21, so older Kotlin versions do not run on the JDK 21 backend. (At least not in Gradle.)
+Notice that the Kotlin version used for this code is **1.9.20**.
+We need this high of a version since Kotlin 1.9.20 comes with a new JvmTarget for the JDK 21,
+so older Kotlin versions do not run on the JDK 21 backend. (At least not in Gradle.)
 
 ## What about Coroutines?
 
