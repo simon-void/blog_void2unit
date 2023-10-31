@@ -28,7 +28,7 @@ configured just like that.
 ```xml
     <properties>
         ...
-        <kotlin.version>1.9.20-RC</kotlin.version>
+        <kotlin.version>1.9.20</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>    <!-- optional: for fast builds -->
         ...
     </properties>
@@ -235,10 +235,10 @@ Yes
 
 ### mixed Java and Kotlin config
 
-Yes, as long as you set `kotlin.version` to higher than `1.9.10`,
+Yes, as long as your `kotlin.version` is at least `1.9.20`,
 since Kotlin `1.9.20-Beta1` was the first version to support a jvmTarget of `21`.
 
-### pure Kotlin
+### pure Kotlin config
 
 No, or more precisely, not before Kotlin 2.0 which will be released in early 2024.
 
@@ -252,7 +252,9 @@ Caused by: java.lang.IllegalAccessError: superclass access check failed: class o
 The [bug](https://youtrack.jetbrains.com/issue/KT-60507/Kapt-IllegalAccessError-superclass-access-check-failed-using-java-21-toolchain)
 has already been fixed, but only in Kotlin version `2.0.0-Beta1` and onwards.
 
-Your project might not trigger this bug, if it doesn't use Spring. E.g. I've got a [demo project showcasing Kotlin using Java 21 APIs](https://github.com/simon-void/vthreads_with_kotlin_demo/blob/main/build.gradle.kts) that works without a problem. So give it a try.
+Your project might not trigger this bug, if it doesn't use Spring or Maven. E.g. I've got a
+[demo project showcasing Kotlin using Java 21 APIs](https://github.com/simon-void/vthreads_with_kotlin_demo/blob/main/build.gradle.kts)
+using Gradle and not using Spring that works without a problem. So give it a try.
 
 Maybe there's a pure Kotlin config that does work even with SpringBoot, but I didn't find it. The workaround I see, if you want to use Java 21 and Spring Boot from Kotlin right now, is to us the Java & Kotlin config, even though you don't have any Java source files in your project.
 
