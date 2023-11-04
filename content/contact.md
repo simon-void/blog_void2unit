@@ -5,8 +5,6 @@ date = "2023-03-02"
 author = "Stephan Schröder"
 +++
 
-via [github.com/simon-void/](https://github.com/simon-void/)
-
 <form class="mb-5" id="contact-form">
   <div class="form-group">
     <label for="senderEmailId" style="width: 400px">your email:</label>
