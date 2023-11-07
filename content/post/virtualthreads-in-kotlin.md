@@ -63,9 +63,10 @@ total execution time: 1240ms
 ```
 You can find the repo for this project [here](https://github.com/simon-void/vthreads_with_kotlin_demo).
 
-Notice that the Kotlin version used for this code is **1.9.20**.
-We need this high of a version since Kotlin 1.9.20 comes with a new JvmTarget for the JDK 21,
-so older Kotlin versions do not run on the JDK 21 backend. (At least not in Gradle.)
+Notice that the Kotlin version used for this code is **1.9.20** and the Gradle version is **8.5-rc-1**.
+Both is the minimum for a JvmTarget for the Java21.
+(Technically you could already configure Gradlew 8.4 to produce Java21 bytecode via [toolchains](https://docs.gradle.org/8.4/release-notes.html#support-for-building-projects-with-java-21), but the Gradle scripts itself couldn't
+be executed on a Java21-JVM, which made the whole setup a bit too cumbersome for my taste.)
 
 ## What about Coroutines?
 
@@ -73,7 +74,7 @@ But Kotlin already has [Coroutines](https://kotlinlang.org/docs/coroutines-overv
 
 Well, both Coroutines and Virtual Threads enable concurrent programming, but according to Kotlin's project lead, both
 approaches are optimized for different things and therefor either one can be the appropriate one to use depending on the
-usecase. Take a look at his [talk at KotlinConf'23](https://www.youtube.com/watch?v=zluKcazgkV4).
+use-case. Take a look at his [talk at KotlinConf'23](https://www.youtube.com/watch?v=zluKcazgkV4).
 
 ## Conclusion
 
