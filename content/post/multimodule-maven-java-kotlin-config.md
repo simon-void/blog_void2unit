@@ -18,7 +18,7 @@ So this is what I learned:
 ## Assumptions
 
 You have a Java Project using Spring Boot which is seperated into several Maven modules. The parent pom of all modules
-is the pom-file in the base directory. Here's a [demo project](https://github.com/simon-void/java_to_kotlin_config_demo/tree/java_config)
+is the pom-file in the base directory and the parent of that pom is **spring-boot-starter-parent**. Here's a [demo project](https://github.com/simon-void/java_to_kotlin_config_demo/tree/java_config)
 configured just like that.
 
 ## How to modify the main pom-file
@@ -29,7 +29,7 @@ configured just like that.
     <properties>
         ...
         <kotlin.version>1.9.20</kotlin.version>
-        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>    <!-- optional: for fast builds -->
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>    <!-- optional: for faster builds -->
         ...
     </properties>
 ```
