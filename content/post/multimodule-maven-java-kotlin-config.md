@@ -28,11 +28,14 @@ configured just like that.
 ```xml
     <properties>
         ...
+        <java.version>17</java.version>
         <kotlin.version>1.9.20</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>    <!-- optional: for faster builds -->
         ...
     </properties>
 ```
+The properties `maven.compiler.source` and `maven.compiler.target` can be removed - should they be present in your configuration -
+since we'll also update the configuration of the **maven-compiler-plugin**. 
 
 - prepare the dependencies for **kotlin-reflect** and **kotlin-stdlib**:
 
