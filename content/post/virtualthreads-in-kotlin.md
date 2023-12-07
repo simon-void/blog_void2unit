@@ -63,8 +63,7 @@ total execution time: 1240ms
 ```
 You can find the repo for this project [here](https://github.com/simon-void/vthreads_with_kotlin_demo).
 
-Notice that the Kotlin version used for this code is **1.9.20** and the Gradle version is **8.5-rc-1**.
-Both is the minimum for a JvmTarget for the Java21.
+The minimum version for Kotlin and Gradle to use to be able to compile to JDK 21 is **Kotlin 1.9.20** and **Gradle 8.5**.
 (Technically you could already configure Gradlew 8.4 to produce Java21 bytecode via [toolchains](https://docs.gradle.org/8.4/release-notes.html#support-for-building-projects-with-java-21), but the Gradle scripts itself couldn't
 be executed on a Java21-JVM, which made the whole setup a bit too cumbersome for my taste.)
 
