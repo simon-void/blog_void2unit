@@ -28,8 +28,8 @@ configured just like that.
 ```xml
     <properties>
         ...
-        <java.version>17</java.version>
-        <kotlin.version>1.9.20</kotlin.version>
+        <java.version>21</java.version>
+        <kotlin.version>2.0.0</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>    <!-- optional: for faster builds -->
         ...
     </properties>
@@ -109,7 +109,7 @@ since we'll also update the configuration of the **maven-compiler-plugin**.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.13.0</version>
                 <executions>
                     <!-- Replacing default-compile as it is treated specially by maven -->
                         <execution>
@@ -226,39 +226,20 @@ to the configured JVM bytecode version.
 
 Here's the [Kotlin config branch](https://github.com/simon-void/java_to_kotlin_config_demo/tree/kotlin_config) of my demo project to double-check.
 
-## What about JDK21 support
+## Minimum Kotlin versions for JDK21 support
 
-When you check my demo project, you'll see that I've used `<java.version>17</java.version>` for all the different branches/configurations.
-So assuming a JDK21 is installed on your system, can you simply set that property to `21` so that your Kotlin code can use Java 21 APIs
-and your code gets compiled to JVM 21 bytecode?
-
-### pure Java config
-
-Yes
+When you check my demo project, you'll see that I've used `<java.version>21</java.version>` for all the different branches/configurations.
+What is the minimum Kotlin version to support this:
 
 ### mixed Java and Kotlin config
 
-Yes, as long as your `kotlin.version` is at least `1.9.20`,
-since Kotlin `1.9.20-Beta1` was the first version to support a jvmTarget of `21`.
+Your `kotlin.version` has to be at least `1.9.20`, since Kotlin `1.9.20-Beta1` was the first version to support a jvmTarget of `21`.
 
 ### pure Kotlin config
 
-No, or more precisely, not before Kotlin 2.0 which will be released in early 2024.
-
-#### Background
-
-Apparently a `CommandLine` class, that Kotlin uses, was moved/removed in Java 21, so Kotlin currently doesn't find it.
-The error, which is thrown, does look like this:
+Your `kotlin.version` has to be at least `2.0.0` in order to use JDK 21. For Kotlin versions `1.9.2(0-4)` an error is thrown, does look like this:
 ```text
 Caused by: java.lang.IllegalAccessError: superclass access check failed: class org.jetbrains.kotlin.kapt3.base.javac.KaptJavaCompiler (in unnamed module @0x17de6b) cannot access class com.sun.tools.javac.main.JavaCompiler (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.main to unnamed module @0x17de6b
 ```
 The [bug](https://youtrack.jetbrains.com/issue/KT-60507/Kapt-IllegalAccessError-superclass-access-check-failed-using-java-21-toolchain)
-has already been fixed, but only in Kotlin version `2.0.0-Beta1` and onwards.
-
-Your project might not trigger this bug, if it doesn't use Spring or Maven. E.g. I've got a
-[demo project showcasing Kotlin using Java 21 APIs](https://github.com/simon-void/vthreads_with_kotlin_demo/blob/main/build.gradle.kts)
-using Gradle and not using Spring that works without a problem. So give it a try.
-
-Maybe there's a pure Kotlin config that does work even with SpringBoot, but I didn't find it. The workaround I see, if you want to use Java 21 and Spring Boot from Kotlin right now, is to us the Java & Kotlin config, even though you don't have any Java source files in your project.
-
-But luckily, Kotlin 2.0 isn't far off :)
+is fixed from Kotlin version `2.0.0-Beta1` onwards.
