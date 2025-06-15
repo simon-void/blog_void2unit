@@ -11,13 +11,16 @@ tags = [
 ]
 +++
 
-Kotlin was developed  as a "better Java", with the interoperability with it being a primary concern. Not totally coincidentally that makes moving from Java to Kotlin very straightforward.
-Most features of Java and its immediate ecosystem including the likes of Lombok have direct or not-so-direct counterparts.
-So while rewriting a Java project to Kotlin, should you e.g. encounter a Lombok @Data annotation you can simply use a `data class` on Kotlin's side.
+Kotlin was developed as a "better Java," with the interoperability with it being a primary concern. Not totally coincidentally, that makes moving from Java to Kotlin very straightforward.
+Most features of Java and its immediate ecosystem, including the likes of Lombok, have direct or not-so-direct counterparts.
+So while rewriting a Java project to Kotlin, should you e.g. encounter a Lombok @Data annotation you can use a `data class` on Kotlin's side.
 
 **But what about Lombok's @Builder annotation? There seems to be no in-build builder facility in Kotlin. Do we have to implement a Builder for each class manually?**
 
-**TLDR:** No, we don't. Use optional parameters (=parameters with default arguments) in your Kotlin class and use named parameters when invoking it.  
+**TLDR:** No, we don't. Use optional parameters (=parameters with default arguments) in your Kotlin class and use named parameters when invoking it.
+
+**Update:** A talk at KotlinConf 2025 convinced me that there actually is a place for the builder pattern left in Kotlin: to achieve binary backwards compatibility across different versions of a public API.
+But if that's not what you're building, the point of this article stands.
 
 ## What is the problem Lombok @Builder is solving?
 
@@ -43,11 +46,11 @@ var a = A.builder()
             .setPassword("12324")
             .build();
 ```
-As you can see, we no longer have to provide the parameters we don't have values for, and it's immediate apparent that you didn't confuse the order of parameters.
+As you can see, we no longer have to provide the parameters we don't have values for, and it's immediately clear that you did not confuse the order of parameters.
 It's definitely progress.
 
 **Side note: If you're very concerned about securing that you don't mix up usernames and passwords, you can use wrapper types.**
-After all your organisation might give out usernames like "1234" and allow passwords like "a_schmidt". With Lombok's help, this would look like
+After all your organization might give out usernames like "1234" and allow passwords like "a_schmidt". With Lombok's help, this would look like
 
 ```java
 @Value
@@ -104,8 +107,8 @@ val a = A(
 ```
 
 As you can see, this looks very close to what a Builder in Java gives you, but comes out of the box in Kotlin.
-Yes, you do have to think a bit more when writing the constructor in order to determine which parameters are optional and which ones have to be provided every time.
-This gives you additional security though (not even thinking about nullability here). In Java you can write code like
+Yes, you do have to think a bit more when writing the constructor to determine which parameters are optional and which ones have to be provided every time.
+This gives you additional security though (not even thinking about nullability here). In Java, you can write code like
 
 ```java
 var a = A.builder()
@@ -113,7 +116,7 @@ var a = A.builder()
             .build();
 ```
 
-and create an instance that is bound to trigger a NullPointer exception (or fail a check) at runtime.
+and create an instance bound to trigger a NullPointer exception (or fail a check) at runtime.
 In Kotlin the equivalent code
 
 ```kotlin
@@ -121,7 +124,7 @@ val a = A(
     password = "1234",
 )
 ```
-won't even compile. Most likely you will notice it immediately because your IDE will point it out to you.
+won't even compile. Most likely, you will notice it immediately because your IDE will point it out to you.
 
 **Misconception: I heard there was a Lombok plugin for Kotlin. So can't I simply use the @Builder on a Kotlin class anyway?**
 Yes and No.
@@ -136,11 +139,11 @@ So the plugin is really useful while converting a Java project to Kotlin, but yo
 **Side note: wrapper types don't cause a runtime overhead in Kotlin.**
 Using wrapper types to increase type safety were mentioned in the Java section, 
 so let's see how this topic is handled in Kotlin.
-Obviously you can also write wrapper types in Kotlin, since in Java wrapper types were normal classes and Kotlin got those as well.
+You can also write wrapper types in Kotlin, since in Java wrapper types were normal classes and Kotlin got those as well.
 Not so obvious is that Kotlin provided a better/more runtime efficient way!
 The general tradeoff with normal wrapper classes is that they cause an additional pointer indirection overhead.
 For this reason some people avoid wrapper types even though the gained compiletime safety would probably be worth it.
-Kotlin provides specialised classes called [inline classes](https://kotlinlang.org/docs/inline-classes.html), that are (most often) compiled away. 
+Kotlin provides specialized classes called [inline classes](https://kotlinlang.org/docs/inline-classes.html), that are (most often) compiled away. 
 So you are left with all the safety and (mostly) none of the runtime overhead.
 (The most common case, where the overhead can't be compiled away, is when you create a generic collection of an inline class.
 But simply passing an inline class around or storing it in a property is completely runtime performance penalty free.)
@@ -162,7 +165,7 @@ When you use it or implement your mapper classes in Java by hand, this section b
 
 With what to replace or how to use mapstruct is the second most common question I heard when refactoring a Java project to Kotlin.
 Mapstruct itself will tell you that you can use it in Kotlin projects. The problem is that it knows nothing about Kotlin nullability or optional parameter, so all the properties of
-your Kotlin class would have to be nullable and without default value. This is obviously not idiomatic for Kotlin, so **don't use mapstruct** in Kotlin.
+your Kotlin class would have to be nullable and without default value. This is not idiomatic for Kotlin, so **don't use mapstruct** in Kotlin.
 
 To the best of my knowledge, there's no Kotlin equivalent compiler plugin either to take over mapper generation in Kotlin land.
 But I suspect that the reason for this is that writing mappers manually in Kotlin is less cumbersome than in Java.
