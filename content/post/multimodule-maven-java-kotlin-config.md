@@ -18,7 +18,7 @@ So this is what I learned:
 ## Assumptions
 
 You have a Java Project using Spring Boot which is seperated into several Maven modules. The parent pom of all modules
-is the pom-file in the base directory and the parent of that pom is **spring-boot-starter-parent**. Here's a [demo project](https://github.com/simon-void/java_to_kotlin_config_demo/tree/java_config)
+is the pom-file in the base directory and the parent of that pom is **spring-boot-starter-parent**. Here's a [demo project](https://codeberg.org/simon-void/java_to_kotlin_config_demo/tree/java_config)
 configured just like that.
 
 ## How to modify the main pom-file
@@ -203,7 +203,7 @@ The order of these plugins is important. Otherwise, your Kotlin code might see y
 Now you can add a `src/main/kotlin`-Path in your project and convert some of your Java classes to Kotlin.
 
 And that's already all there is to do to change your Java project to a Java and Kotlin project. You can check the [Java
-and Kotlin config branch](https://github.com/simon-void/java_to_kotlin_config_demo/tree/java_and_kotlin_config) of my demo project.
+and Kotlin config branch](https://codeberg.org/simon-void/java_to_kotlin_config_demo/tree/java_and_kotlin_config) of my demo project.
 
 ## Bonus: pure Kotlin configuration
 
@@ -224,7 +224,7 @@ So once all the source files have all been converted to Kotlin, can we simplify 
 - keep the `<java.version>` in the properties block, the **spring-boot-maven-plugin** will still use it to compile the Kotlin code
 to the configured JVM bytecode version.
 
-Here's the [Kotlin config branch](https://github.com/simon-void/java_to_kotlin_config_demo/tree/kotlin_config) of my demo project to double-check.
+Here's the [Kotlin config branch](https://codeberg.org/simon-void/java_to_kotlin_config_demo/tree/kotlin_config) of my demo project to double-check.
 
 ## Minimum Kotlin versions for JDK21 support
 

@@ -98,7 +98,7 @@ dependencies {
     implementation("org.apache.cxf:cxf-spring-boot-starter-jaxrs:$cxfVersion")
 }
 ```
-The whole project is available on [GitHub](https://github.com/simon-void/minimal-cxf-setup-with-gradle-springboot3-kotlin).
+The whole project is available on [GitHub](https://codeberg.org/simon-void/minimal-cxf-setup-with-gradle-springboot3-kotlin).
 
 ## the final puzzle piece
 

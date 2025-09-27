@@ -61,7 +61,7 @@ Let's try out VirtualThreads!
 sum of individual execution times: 3359ms
 total execution time: 1240ms
 ```
-You can find the repo for this project [here](https://github.com/simon-void/vthreads_with_kotlin_demo).
+You can find the repo for this project [here](https://codeberg.org/simon-void/vthreads_with_kotlin_demo).
 
 The minimum version for Kotlin and Gradle to use to be able to compile to JDK 21 is **Kotlin 1.9.20** and **Gradle 8.5**.
 (Technically you could already configure Gradlew 8.4 to produce Java21 bytecode via [toolchains](https://docs.gradle.org/8.4/release-notes.html#support-for-building-projects-with-java-21), but the Gradle scripts itself couldn't
